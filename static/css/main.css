@@ -1,0 +1,100 @@
+*{
+  padding: 0;
+  margin: 0;
+}
+body{
+  min-width: 1024px;
+}
+.TextAlignC {
+  text-align: center;
+}
+.TextAlignL {
+  text-align: left;
+}
+.TextAlignR {
+  text-align: right;
+}
+
+.MarginT_10 {
+  margin-top: 10px;
+}
+.MarginB_10 {
+  margin-bottom: 10px;
+}
+.MarginT_20 {
+  margin-top: 20px;
+}
+.MarginB_20 {
+  margin-bottom: 20px;
+}
+
+.PaddingL_28{
+  padding-left: 28px;
+}
+
+.ColorWhite {
+  color: #fff;
+}
+.BgGray {
+  background: dimgrey;
+}
+
+.MarginT_20{
+  margin-top: 20px;
+}
+.MarginB_10{
+  margin-bottom: 10px;
+}
+
+.CursorPointer{
+  cursor: pointer;
+}
+.NotAllowed{
+  cursor: not-allowed !important;
+}
+#budget td .el-input__inner{
+  text-align: center;
+  width: 99%;
+  border-radius: 0 !important;
+  border: 0px solid #fff !important;
+  font-size: 14px !important;
+}
+.DisabledNormal .el-input.is-disabled .el-input__inner {
+  background-color: #fff !important;
+  color: #606266 !important;
+}
+span .el-input.is-disabled .el-input__inner {
+  background-color: #fff !important;
+  color: #606266 !important;
+}
+table .el-input.is-disabled .el-input__inner {
+  background-color: #fff !important;
+  color: #606266 !important;
+}
+.formContract .el-input.is-disabled .el-input__inner {
+  background-color: #fff !important;
+  color: #606266 !important;
+}
+.el-textarea.is-disabled .el-textarea__inner {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+.WhiteLable .el-form-item__label{
+  color: #fff;
+}
+.sortBlock .el-menu-item, .el-submenu__title{
+  height: 30px !important;
+  line-height: 30px !important;
+}
+.sortBlock .el-menu-item:focus, .el-menu-item:hover{
+  background: transparent;
+}
+.sortBlock .el-menu-item.is-active{
+  /* background: #ecf5ff; */
+}
+#resultTable thead .el-table td, #resultTable thead th{
+  background: #7bbfea;
+}
+#resultTable thead th>.cell{
+  color: #fff;
+}
