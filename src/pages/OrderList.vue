@@ -122,7 +122,8 @@ export default {
       personOptions: [
         {lable: '张东琴', value: '张东琴'},
         {lable: '王璐', value: '王璐'},
-        {lable: '储开琴', value: '储开琴'}
+        {lable: '储开琴', value: '储开琴'},
+        {lable: '许颖敏', value: '许颖敏'}
       ]
     }
   },

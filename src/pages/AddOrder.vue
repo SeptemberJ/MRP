@@ -211,6 +211,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import $ from 'jquery'
 import {objDeepCopy} from '../util/utils'
 // import { formatUrl } from '../../../../工程合同监控/HTJK/HTJK/src/util/utils'
@@ -238,6 +239,9 @@ export default {
   watch: {
   },
   methods: {
+    ...mapActions([
+      'updateOrderMRPId'
+    ]),
     chooseOrder () {
       this.dialogAddVisible = true
       this.handleCurrentChange()
@@ -319,17 +323,18 @@ export default {
         let Result = xmlDoc.getElementsByTagName('MRP_InsertResponse')[0].getElementsByTagName('MRP_InsertResult')[0]
         let HtmlStr = $(Result).html()
         let Info = (JSON.parse(HtmlStr))[0]
+        console.log(Info)
         if (Info.code === '1') {
           this.$message({
             message: '新增成功!',
             type: 'success'
           })
-          this.addTableOrder = []
-          this.selectedAllList = []
-          this.selectedUniqueSignList = []
+          // this.addTableOrder = []
+          // this.selectedAllList = []
+          // this.selectedUniqueSignList = []
           this.btLoading = false
-          // this.updateBudgetId(Info.ID)
-          // this.$router.push({name: 'BudgetDetail'})
+          this.updateOrderMRPId(Info.ID)
+          this.$router.push({name: 'MRPDetail'})
         } else {
           this.$message({
             message: '新增失败!',

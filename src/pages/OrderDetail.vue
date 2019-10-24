@@ -2,7 +2,7 @@
   <div class="AddOrder" v-loading="loadingBg">
     <el-row>
       <el-col :span="24">
-        <el-button type="danger" plain icon="el-icon-plus" size="small" @click="chooseOrder" style="float:right;">选择订单</el-button>
+        <el-button type="danger" plain icon="el-icon-plus" size="small" :disabled="status == '投放'" @click="chooseOrder" style="float:right;">选择订单</el-button>
       </el-col>
       <el-col :span="24">
         <!-- 订单列表 -->
@@ -86,13 +86,22 @@
             label="业务员"
             width="100">
           </el-table-column>
+          <el-table-column v-if="status != '投放'"
+            prop=""
+            label="操作"
+            width="60">
+            <template slot-scope="scope">
+              <i class="el-icon-delete CursorPointer" @click="moveLine(scope.row)"></i>
+            </template>
+          </el-table-column>
         </el-table>
       </el-col>
       <el-col :span="24" class="MarginT_20">
-        <el-button size="small" type="danger" :loading="btLoading" @click="submit">保 存</el-button>
-        <el-button size="small" type="success" :loading="btLoading" @click="operate('运算')">运 算</el-button>
+        <el-button size="small" type="danger" :loading="btLoading" :disabled="status == '投放'" @click="submit">保 存</el-button>
+        <el-button size="small" type="success" :loading="btLoading" @click="operate('运算')" :disabled="status == '投放'">运 算</el-button>
         <el-button size="small" type="warning" :loading="btLoading" @click="operate('投放')" :disabled="status == '' || status == '投放'">投 放</el-button>
         <el-button size="small" type="primary" :loading="btLoading" @click="seeReport">运算报告</el-button>
+        <el-button size="small" type="info" :loading="btLoading" :disabled="status == '投放'" @click="delReport">整单删除</el-button>
       </el-col>
     </el-row>
     <!-- 添加订单 -->
@@ -253,13 +262,28 @@ export default {
   },
   created () {
     this.getDetail()
+    this.getOrderList()
   },
   watch: {
+    selectedAllList: function (newVal) {
+      console.log('change---')
+      this.addTableOrder = newVal
+    }
   },
   components: {
     OperationalReport
   },
   methods: {
+    moveLine (row) {
+      this.$confirm('确认移除该记录?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.selectSingle([], row)
+      }).catch(() => {
+      })
+    },
     chooseOrder () {
       this.handleCurrentChange()
       this.dialogAddVisible = true
@@ -448,6 +472,18 @@ export default {
           })
           this.loadingBg = false
           this.getDetail()
+        } else if (Info.code === '2' || Info.code === 2) {
+          this.$message({
+            message: '您还存在未投放的单子，不能进行运算!',
+            type: 'warning'
+          })
+          this.loadingBg = false
+        } else if (Info.code === '3' || Info.code === 3) {
+          this.$message({
+            message: '您还存在未审核的采购申请单，不能进行运算!',
+            type: 'warning'
+          })
+          this.loadingBg = false
         } else {
           this.$message({
             message: type + '失败!',
@@ -463,6 +499,53 @@ export default {
     seeReport () {
       this.timeStamp = (new Date()).getTime()
       this.dialogVisibleReport = true
+    },
+    delReport () {
+      this.$confirm('该操作将彻底删除整张单据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.sureDel()
+      }).catch(() => {
+      })
+    },
+    sureDel () {
+      this.btLoading = true
+      var tmpData = '<?xml version="1.0" encoding="utf-8"?>'
+      tmpData += '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"> '
+      tmpData += '<soap:Body> '
+      tmpData += '<MRP_DEL xmlns="http://tempuri.org/">'
+      tmpData += '<ID>' + this.curReportId + '</ID>'
+      tmpData += '</MRP_DEL>'
+      tmpData += '</soap:Body>'
+      tmpData += '</soap:Envelope>'
+      this.Http.post('MRP_DEL', tmpData
+      ).then(res => {
+        let xml = res.data
+        let parser = new DOMParser()
+        let xmlDoc = parser.parseFromString(xml, 'text/xml')
+        // 提取数据
+        let Result = xmlDoc.getElementsByTagName('MRP_DELResponse')[0].getElementsByTagName('MRP_DELResult')[0]
+        let HtmlStr = $(Result).html()
+        let Info = (JSON.parse(HtmlStr))[0]
+        if (Info.code === '1') {
+          this.$message({
+            message: '删除成功!',
+            type: 'success'
+          })
+          this.$router.push({name: 'OrderList'})
+        } else {
+          this.$message({
+            message: '删除失败!',
+            type: 'error'
+          })
+          this.btLoading = false
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.btLoading = false
+      })
     },
     getOrderList () {
       return new Promise((resolve, reject) => {
@@ -533,6 +616,7 @@ export default {
         console.log('Detail', Info)
         if (Info.length > 0) {
           this.status = Info[0]['状态']
+          this.curReportId = Info[0].FInterID
           this.selectedAllList = Info.map((item, idx) => {
             item.idx = idx
             item['单据编号'] = item['订单单号']
