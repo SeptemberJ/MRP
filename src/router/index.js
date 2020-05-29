@@ -3,7 +3,6 @@ import VueRouter from 'vue-router'
 import OrderList from '@/pages/OrderList'
 import AddOrder from '@/pages/AddOrder'
 import MRPDetail from '@/pages/OrderDetail'
-import HelloWorld from '@/pages/HelloWorld'
 
 Vue.use(VueRouter)
 
@@ -27,12 +26,7 @@ const router = new VueRouter({
       component: MRPDetail,
       meta: {requireAuth: false}
     },
-    {
-      path: '/HelloWorld',
-      name: 'OrderLHelloWorldist',
-      component: HelloWorld,
-      meta: {requireAuth: false}
-    }
+    {path: '*', redirect: '/OrderList'}
   ]
 })
 

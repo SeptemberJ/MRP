@@ -15,7 +15,7 @@
             type="index"
             width="50">
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             label="checked">
             <template slot-scope="scope">
               <span>{{scope.row.checked ? 1: 0}}</span>
@@ -25,7 +25,7 @@
             prop="uniqueSign"
             label="uniqueSign"
             show-overflow-tooltip>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column
             prop="单据编号"
             label="单据编号"
@@ -126,7 +126,7 @@
             type="index"
             width="50">
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             label="checked">
             <template slot-scope="scope">
               <span>{{scope.row.checked ? 1: 0}}</span>
@@ -136,7 +136,7 @@
             prop="uniqueSign"
             label="uniqueSign"
             show-overflow-tooltip>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column
             prop="单据编号"
             label="单据编号"

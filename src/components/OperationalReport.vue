@@ -104,7 +104,7 @@
         width="150">
         <template slot-scope="scope">
           <span v-if="scope.row['物料代码'] == '合计'"></span>
-          <el-input v-else v-model="scope.row['本次申请']" @blur="saveApply(scope.row)"></el-input>
+          <el-input v-else v-model="scope.row['本次申请']" :disabled="status == '投放'" @blur="saveApply(scope.row)"></el-input>
         </template>
       </el-table-column>
       <el-table-column
@@ -118,6 +118,13 @@
         width="120">
       </el-table-column>
     </el-table>
+    <el-pagination v-if="reportList.length > 0" style="margin: 10px 0;"
+      @current-change="getReportList"
+      :current-page.sync="curPage"
+      :page-size="pageSize"
+      layout="total, prev, pager, next, jumper"
+      :total="sum">
+    </el-pagination>
   </div>
 </template>
 
@@ -125,7 +132,7 @@
 import $ from 'jquery'
 export default {
   name: 'OperationalReport',
-  props: ['timeStamp', 'orderMRPId'],
+  props: ['timeStamp', 'orderMRPId', 'status'],
   data () {
     return {
       loading: false,
@@ -135,7 +142,10 @@ export default {
       normalAmount: 0,
       filterFType: [],
       filterSFTD: [],
-      filterBCSQ: []
+      filterBCSQ: [],
+      curPage: 1,
+      pageSize: 50,
+      sum: 0
     }
   },
   created () {
@@ -162,7 +172,6 @@ export default {
       }
     },
     filterHandlerFType (type, row, column) {
-      debugger
       const property = column['property']
       switch (type) {
         case 'Y':
@@ -170,7 +179,6 @@ export default {
         case 'N':
           return row[property] === 'N'
       }
-      debugger
     },
     filterHandler (type, row, column) {
       const property = column['property']
@@ -185,11 +193,9 @@ export default {
       let temp = []
       let pro = ''
       if (Info.FType) {
-        debugger
         pro = 'FType'
         this.filterFType = Info[pro]
       } else if (Info['是否替代料']) {
-        debugger
         pro = '是否替代料'
         this.filterSFTD = Info[pro]
       } else if (Info['本次申请']) {
@@ -219,7 +225,6 @@ export default {
           }
         })
       } else if (this.filterFType.length === 0 && this.filterSFTD.length === 0 && this.filterBCSQ.length !== 0) {
-        debugger
         // 只过滤本次申请
         this.reportListCopy.map((item, idx) => {
           if (this.filterBCSQ.indexOf('等于0') !== -1 && item['本次申请'] === 0) {
@@ -259,7 +264,6 @@ export default {
             }
           })
         } else if (this.filterFType.length > 0 && this.filterSFTD.length > 0 && this.filterBCSQ.length === 0) {
-          debugger
           this.reportListCopy.map((item, idx) => {
             if (this.filterFType.indexOf(item.FType) !== -1 && this.filterSFTD.indexOf(item['是否替代料']) !== -1) {
               temp.push(item)
@@ -346,7 +350,7 @@ export default {
       tmpData += '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"> '
       tmpData += '<soap:Body> '
       tmpData += '<JA_LIST xmlns="http://tempuri.org/">'
-      tmpData += '<FSQL><![CDATA[exec [Z_MRP_Compute]' + this.orderMRPId + ']]></FSQL>'
+      tmpData += '<FSQL><![CDATA[exec [Z_MRP_Compute]' + this.orderMRPId + ',' + Number((this.curPage - 1) * this.pageSize + 1) + ',' + this.curPage * this.pageSize + ']]></FSQL>'
       tmpData += '</JA_LIST>'
       tmpData += '</soap:Body>'
       tmpData += '</soap:Envelope>'
@@ -362,7 +366,8 @@ export default {
         let Info = JSON.parse(HtmlStr)
         if (Info.length > 0) {
           document.getElementsByClassName('el-table__fixed')[0].style.setProperty('height', this.tableHieght - 16 + 'px', 'important')
-          console.log(Info)
+          // console.log(Info)
+          this.sum = Info[0].fcount
           let normalAmount = 0
           let sumLine = {
             '物料代码': '合计',
@@ -396,6 +401,7 @@ export default {
             }
           })
         } else {
+          this.sum = 0
           this.reportList = Info
           this.loading = false
         }
